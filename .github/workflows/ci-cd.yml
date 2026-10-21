@@ -10,7 +10,6 @@ jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
-    # Native Docker service container (replaces LocalStack/setup-localstack)
     services:
       localstack:
         image: localstack/localstack:3.8.0
@@ -31,9 +30,9 @@ jobs:
         run: pip install awscli-local
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
-          terraform_version: 1.6.0
+          terraform_version: 1.8.0
 
       - name: Wait for LocalStack Health Check
         run: |
