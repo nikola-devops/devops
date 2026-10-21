@@ -10,6 +10,14 @@ jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
+    # Run LocalStack directly as a native Docker service container
+    services:
+      localstack:
+        image: localstack/localstack:3.8.0
+        ports:
+          - 4566:4566
+          - 4510-4559:4510-4559
+
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -19,16 +27,21 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Install awscli-local
+        run: pip install awscli-local
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.0
 
-      - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.2.3
-        with:
-          image-tag: '3.8.0'
-          install-awslocal: 'true'
+      - name: Wait for LocalStack Health Check
+        run: |
+          until curl -s http://localhost:4566/_localstack/health | grep -q '"dynamodb": "running"\|"available"'; do
+            echo "Waiting for LocalStack container to start..."
+            sleep 2
+          done
+          echo "LocalStack is ready!"
 
       - name: Initialize and Validate Terraform
         run: |
