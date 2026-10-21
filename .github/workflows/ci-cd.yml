@@ -10,7 +10,7 @@ jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
-    # Run LocalStack directly as a native Docker service container
+    # Native Docker service container (replaces LocalStack/setup-localstack)
     services:
       localstack:
         image: localstack/localstack:3.8.0
