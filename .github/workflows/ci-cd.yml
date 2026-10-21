@@ -16,6 +16,11 @@ jobs:
         ports:
           - 4566:4566
           - 4510-4559:4510-4559
+        env:
+          SERVICES: s3,lambda,dynamodb,apigateway,iam
+          DOCKER_HOST: unix:///var/run/docker.sock
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
 
     steps:
       - name: Checkout Source Code
@@ -49,6 +54,10 @@ jobs:
           terraform validate
 
       - name: Deploy Infrastructure to LocalStack
+        env:
+          AWS_ACCESS_KEY_ID: mock_key
+          AWS_SECRET_ACCESS_KEY: mock_secret
+          AWS_DEFAULT_REGION: us-east-1
         run: |
           cd terraform
           terraform apply -auto-approve
