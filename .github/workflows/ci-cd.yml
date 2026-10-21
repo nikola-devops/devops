@@ -24,13 +24,11 @@ jobs:
         with:
           terraform_version: 1.6.0
 
-      - name: Start LocalStack Container
-        uses: LocalStack/setup-localstack@v0.3.2
+      - name: Start LocalStack
+        uses: LocalStack/setup-localstack@v0.2.3
         with:
           image-tag: '3.8.0'
           install-awslocal: 'true'
-        env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
       - name: Initialize and Validate Terraform
         run: |
