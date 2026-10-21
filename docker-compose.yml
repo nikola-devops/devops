@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: localstack_main
+    image: localstack/localstack:3.8.1
+    ports:
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4510-4559:4510-4559"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=ls-xipu0871-3107-puSo-YeHO-JoTOrONa1147
+      - SERVICES=s3,lambda,dynamodb,apigateway,iam
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DISABLE_EVENTS=1
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
