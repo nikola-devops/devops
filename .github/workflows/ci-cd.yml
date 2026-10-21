@@ -1,0 +1,48 @@
+name: DevOps CI/CD Pipeline (LocalStack Validation)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Start LocalStack Container
+        uses: LocalStack/setup-localstack@v0.3.2
+        with:
+          image-tag: '3.8.1'
+          install-awslocal: 'true'
+
+      - name: Initialize and Validate Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform validate
+
+      - name: Deploy Infrastructure to LocalStack
+        run: |
+          cd terraform
+          terraform apply -auto-approve
+
+      - name: Run Integration Tests Against Local AWS
+        run: |
+          awslocal dynamodb list-tables
+          awslocal lambda invoke --function-name UserServiceFunction output.json
+          grep -q "200" output.json && echo "Integration Test Passed!" || exit 1
